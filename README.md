@@ -1,34 +1,27 @@
-# Node-based generator for helse-skjema DOCX
+# helse-skjema — klient-side generator
 
-Dette repoet inneholder en enkel web-app (Node + Express) som lar deg laste opp en JSON-fil og en valgfri logo, og så genererer en .docx-fil basert på JSON-innholdet.
+Dette er et enkelt klient-side verktøy for å generere en .docx-fil fra et JSON-objekt i nettleseren.
 
-Hurtigstart (lokalt):
+Hva som er lagt til:
 
-1. Klon repoet:
-   git clone https://github.com/andreasmella/helse-skjema.git
-   cd helse-skjema
+- index.html — skjema for å laste opp JSON og logo og generere .docx
+- script.js — bygger .docx med docx.js og laster ned med FileSaver.js
+- style.css — enkel styling
+- sample.json — lite eksempel du kan laste ned / bruke
 
-2. Installer avhengigheter:
-   npm install
+Hvordan bruke lokalt:
 
-3. Start serveren:
-   npm start
+1. Last ned repoet eller klon.
+2. Åpne `index.html` i nettleseren (dobbelklikk). Moderne nettlesere støtter File API og nedlasting uten server.
+3. Last opp JSON-filen din og eventuelt logo (PNG/JPG). Trykk 'Generer .docx'.
+4. Filen lastes ned automatisk til din nettlesers nedlastingsmappe (vanligvis "Nedlastinger" / "Downloads").
 
-4. Åpne nettleseren på:
-   http://localhost:3000
+Kommentarer og videre arbeid:
 
-Bruk:
-- Velg JSON-filen din i skjemaet og trykk "Generer DOCX". Hvis du vil kan du laste opp en logo som da blir satt inn øverst i dokumentet.
-- Dokumentet genereres og lastes ned i nettleseren.
+- For å få nøyaktig layout som PDF-en kan vi tilpasse oppbygning, fonter og marger. Det er også mulig å bygge en mer avansert template (f.eks. med tables og absolute positioned elements) dersom du ønsker.
+- Hvis du foretrekker å generere PDF i stedet for .docx kan vi legge til jsPDF-eksport som alternativ.
 
-Teknisk:
-- Serveren bruker multer (memory storage) for opplasting.
-- docx (npm) brukes for å generere .docx.
-- JSON-objektet konverteres til en rekke avsnitt: nøkler/verdier. Dette er en enkel baseline — dersom du trenger formatering (tabeller, egne oppsett for bestemte felter), kan jeg legge til tilpassede maler.
+Sikkerhet:
 
-Neste steg jeg kan gjøre for deg om du ønsker:
-- Lage en mer avansert template (med tabeller og bestemte felt på bestemte plasser) som matcher PDF-designet ditt.
-- Forhåndvise DOCX i nettleser som PDF (krever ekstra verktøy/konvertering).
-- Legge til Dockerfile og GitHub Actions for å kjøre appen i en container eller på GitHub Pages/Heroku-like tjenester.
+All generering skjer i klientens nettleser — ingen filer sendes til server.
 
-Viktig: Om du har en PDF-design (du har lastet opp den), si fra hvilke konkrete felter som skal plasseres hvor, så kan jeg oppdatere generatoren til å fylle et riktig layoutet dokument (tabeller/overskrifter osv.).
