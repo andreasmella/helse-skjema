@@ -1,7 +1,0 @@
-{
-  "tittel": "Eksempel: skjema om helseopplysninger",
-  "pasient": { "navn": "Ola Nordmann", "fodselsnummer": "01019012345" },
-  "henvisning": "Vi trenger utlevering av journal for videre behandling.",
-  "journal": { "avdeling": "Klinikk A", "dato": "2026-08-12", "fritekst": "Her kommer en lang fritekst.\nMed linjeskift og flere avsnitt.\nDette skal vises i et stort tekstfelt i PDF." },
-  "signatur": "Dr. Eksempel, avdeling"
-}
