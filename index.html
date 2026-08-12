@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>helse-skjema — generator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="container">
+      <img id="site-logo" src="/logo.png" alt="logo" onerror="this.style.display='none'" />
+      <h1>Helse-skjema (klient-side generator)</h1>
+      <p class="lead">Last opp et JSON-objekt (skjema-data) og generer en .docx-fil i nettleseren. Valgfritt: last opp logo.</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="container card">
+      <label>1) Last opp JSON-fil med skjemaet</label>
+      <input id="json-file" type="file" accept="application/json" />
+
+      <label>2) Valgfritt: last opp logo (PNG/JPG)</label>
+      <input id="logo-file" type="file" accept="image/*" />
+
+      <div class="controls">
+        <button id="generate">Generer .docx</button>
+        <span id="status"></span>
+      </div>
+
+      <hr />
+      <h3>Hvordan bruke</h3>
+      <ol>
+        <li>Last opp JSON-filen (du kan laste opp store filer direkte i nettleseren).</li>
+        <li>Last opp logo hvis du ønsker (logo vises i toppavsnittet i dokumentet).</li>
+        <li>Klikk "Generer .docx". Filen lastes ned automatisk.</li>
+      </ol>
+
+      <p class="note">Merk: dette er en enkel klient-side generator. Layouten er grunnleggende — jeg kan iterere videre etter at du tester og viser ønsket nøyaktig layout fra PDF-en.</p>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <small>Repo: andreasmella/helse-skjema — klient-side løsning. Se README for GitHub Pages-oppsett.</small>
+    </div>
+  </footer>
+
+  <!-- docx and FileSaver from CDN -->
+  <script src="https://unpkg.com/docx@7.6.0/build/index.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="scripts/app.js"></script>
+</body>
+</html>
