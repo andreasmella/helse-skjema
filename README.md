@@ -1,24 +1,28 @@
 # helse-skjema — klient-side generator
 
-Dette repoet inneholder en enkel, klient-side generator som tar et JSON-objekt og genererer en .docx-fil i nettleseren.
+Dette repoet inneholder en enkel klient-side .docx-generator som kjører i nettleseren. Du kan åpne `index.html` lokalt (dobbeltklikk eller åpne i nettleser) og gjøre alt derfra: laste opp JSON og valgfritt logo-bilde, så lastes en .docx-fil ned.
 
-Hvordan bruke
+Hva jeg har lagt til:
+- index.html — enkel UI for å velge JSON + logo og generere .docx
+- generator.js — logikk som bruker `docx` (dolanmiu/docx) og FileSaver i nettleseren
+- styles.css — litt styling
 
-1. Last ned repoet eller klon: `git clone https://github.com/andreasmella/helse-skjema.git`
-2. Åpne `index.html` i nettleseren (dobbelklikk eller høyreklikk -> Åpne i nettleser).
-3. Last opp JSON-filen (skjema-data) og eventuelt logo (PNG/JPG).
-4. Klikk "Generer .docx" — dokumentet lastes ned i nettleserens nedlastingsmappe.
+Hvordan bruke:
+1. Åpne `index.html` i nettleseren.
+2. Velg JSON-filen (skjemaet). Hvis du har en stor fil (f.eks. ~700kb) går det fint — alt skjer i nettleseren.
+3. Valgfritt: last opp en PNG/JPG-logo (den settes som header på første side).
+4. Valgfritt: skriv inn navn på felter som skal behandles som lange fritekstfelt (komma-separert). Hvis du lar feltet stå tomt brukes heuristiske regler (sjekker ord som "forespørsel", "merknad", "begrunnelse" osv.).
+5. Klikk "Generer .docx". Filen lastes ned automatisk.
 
-Merk:
-- All prosessering skjer i klienten (nettleseren); ingenting lastes opp til en server.
-- Layouten i dette eksempelet er grunnleggende. Jeg kan videreutvikle malen for å matche den vedlagte PDF-designen mer nøyaktig (kolonner, tabeller, spacing, skriftstørrelser osv.).
+Design og layout:
+- Jeg følger et enkelt hierarki: tittel (hvis finnes i JSON), så pasientinfo (hvis finnes), så feltene fra JSON.
+- Store fritekstfelt deles i avsnitt ved newline, korte felter settes som én linje.
+- Logo settes i header for første side; sidetall i footer ("Side X av Y").
 
-Neste steg jeg trenger fra deg hvis du ønsker videre utvikling:
+Hvis du ønsker nøyaktig identisk layout med PDF-en (eksakt skrift, linjehøyder, kolonner, posisjonering osv.) anbefaler jeg å bruke en server-side løsning som genererer PDF direkte (f.eks. Puppeteer/HTML/CSS eller LibreOffice/docx-til-PDF), siden Word/docx har begrensninger i styling og html->docx-konvertering vanligvis kan variere.
 
-- Et eksempel-JSON (du nevnte at den er 725 kB) — du kan laste den inn lokalt i nettleseren når du tester, eller jeg kan legge til et eksempel i repoet hvis du ønsker.
-- Eksakt krav til hvilke felter som skal presenteres, rekkefølge, og hvordan lange fritekst-felt skal se ut (font, størrelse, begrenset høyde med linjer?).
-- Eventuelle grafiske elementer (logo: du kan laste opp `logo-helse-sorost.png` i nettleser UI eller jeg kan committe en logo-fil hvis du vil at den skal ligge i repoet).
+Neste steg jeg kan gjøre for deg (hvis du ønsker):
+- Finjustere layout for å matche PDFen nøyaktig (må få eksempler og en liste over hvilke JSON-felter som skal være lange).
+- Legge til en server-side generator (Node) som også kan eksportere ferdig PDF.
 
-Jeg har lagt til: `index.html`, `script.js`, `README.md`.
 
-Hvis du vil at jeg skal committe flere endringer (for eksempel en mer komplett mal som følger PDF-en nærmere), svar "Ja, videre med X" og beskriv ønsket (tabell-layout, sidemarg, font osv.).
