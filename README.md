@@ -1,27 +1,24 @@
 # helse-skjema — klient-side generator
 
-Dette er et enkelt klient-side verktøy for å generere en .docx-fil fra et JSON-objekt i nettleseren.
+Dette repoet inneholder en enkel, klient-side generator som tar et JSON-objekt og genererer en .docx-fil i nettleseren.
 
-Hva som er lagt til:
+Hvordan bruke
 
-- index.html — skjema for å laste opp JSON og logo og generere .docx
-- script.js — bygger .docx med docx.js og laster ned med FileSaver.js
-- style.css — enkel styling
-- sample.json — lite eksempel du kan laste ned / bruke
+1. Last ned repoet eller klon: `git clone https://github.com/andreasmella/helse-skjema.git`
+2. Åpne `index.html` i nettleseren (dobbelklikk eller høyreklikk -> Åpne i nettleser).
+3. Last opp JSON-filen (skjema-data) og eventuelt logo (PNG/JPG).
+4. Klikk "Generer .docx" — dokumentet lastes ned i nettleserens nedlastingsmappe.
 
-Hvordan bruke lokalt:
+Merk:
+- All prosessering skjer i klienten (nettleseren); ingenting lastes opp til en server.
+- Layouten i dette eksempelet er grunnleggende. Jeg kan videreutvikle malen for å matche den vedlagte PDF-designen mer nøyaktig (kolonner, tabeller, spacing, skriftstørrelser osv.).
 
-1. Last ned repoet eller klon.
-2. Åpne `index.html` i nettleseren (dobbelklikk). Moderne nettlesere støtter File API og nedlasting uten server.
-3. Last opp JSON-filen din og eventuelt logo (PNG/JPG). Trykk 'Generer .docx'.
-4. Filen lastes ned automatisk til din nettlesers nedlastingsmappe (vanligvis "Nedlastinger" / "Downloads").
+Neste steg jeg trenger fra deg hvis du ønsker videre utvikling:
 
-Kommentarer og videre arbeid:
+- Et eksempel-JSON (du nevnte at den er 725 kB) — du kan laste den inn lokalt i nettleseren når du tester, eller jeg kan legge til et eksempel i repoet hvis du ønsker.
+- Eksakt krav til hvilke felter som skal presenteres, rekkefølge, og hvordan lange fritekst-felt skal se ut (font, størrelse, begrenset høyde med linjer?).
+- Eventuelle grafiske elementer (logo: du kan laste opp `logo-helse-sorost.png` i nettleser UI eller jeg kan committe en logo-fil hvis du vil at den skal ligge i repoet).
 
-- For å få nøyaktig layout som PDF-en kan vi tilpasse oppbygning, fonter og marger. Det er også mulig å bygge en mer avansert template (f.eks. med tables og absolute positioned elements) dersom du ønsker.
-- Hvis du foretrekker å generere PDF i stedet for .docx kan vi legge til jsPDF-eksport som alternativ.
+Jeg har lagt til: `index.html`, `script.js`, `README.md`.
 
-Sikkerhet:
-
-All generering skjer i klientens nettleser — ingen filer sendes til server.
-
+Hvis du vil at jeg skal committe flere endringer (for eksempel en mer komplett mal som følger PDF-en nærmere), svar "Ja, videre med X" og beskriv ønsket (tabell-layout, sidemarg, font osv.).

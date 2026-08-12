@@ -1,53 +1,51 @@
 <!doctype html>
-<html lang="no">
+<html lang="nb">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Helse-skjema (klient-side generator)</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- docx library -->
-  <script src="https://unpkg.com/docx@7.7.0/build/index.umd.js"></script>
-  <!-- FileSaver for saving blob -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <style>
+    body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:24px}
+    header{margin-bottom:16px}
+    input[type=file]{display:block;margin:8px 0}
+    button{padding:8px 12px}
+    .note{color:#444;margin-top:12px}
+    .example{margin-top:18px;border:1px solid #ddd;padding:12px;background:#fafafa}
+    footer{margin-top:36px;color:#666;font-size:0.9rem}
+  </style>
 </head>
 <body>
-  <main>
-    <h1>Helse-skjema (klient-side generator)</h1>
+  <header>
+    <h1>Helse-skjema — klient-side generator</h1>
+    <p>Last opp JSON-objekt (skjema-data) og generer en .docx-fil i nettleseren. Valgfritt: last opp logo (PNG/JPG).</p>
+  </header>
 
-    <p class="hint">Last opp JSON-objekt (skjema-data) og generer en .docx-fil i nettleseren. Valgfritt: last opp logo.</p>
+  <section>
+    <label for="jsonFile">1) Last opp JSON-fil med skjemaet</label>
+    <input id="jsonFile" type="file" accept="application/json" />
 
-    <div class="form-row">
-      <label>1) Last opp JSON-fil med skjemaet</label>
-      <input id="jsonFile" type="file" accept="application/json">
-    </div>
+    <label for="logoFile">2) Valgfritt: last opp logo (PNG/JPG). Logo brukes i header</label>
+    <input id="logoFile" type="file" accept="image/png, image/jpeg" />
 
-    <div class="form-row">
-      <label>2) Valgfritt: last opp logo (PNG/JPG)</label>
-      <input id="logoFile" type="file" accept="image/png,image/jpeg">
-    </div>
-
-    <div class="form-row">
+    <div style="margin-top:12px">
       <button id="generateBtn">Generer .docx</button>
-      <span id="status"></span>
     </div>
 
-    <section id="preview">
-      <h2>Preview</h2>
-      <pre id="jsonPreview">Ingen JSON lastet opp.</pre>
-    </section>
+    <div class="note">
+      Merk: Dette er en klient-side generator som kjører i nettleseren — filen lastes ned (ingen server-side lagring).
+    </div>
 
-    <section>
-      <h3>Hvordan bruke</h3>
-      <ol>
-        <li>Last opp JSON-filen (du kan laste opp store filer direkte i nettleseren).</li>
-        <li>Last opp logo hvis du ønsker (logo vises i topptekst i dokumentet).</li>
-        <li>Klikk "Generer .docx" — Filen lastes ned automatisk til din nettlesers nedlastingsmappe.</li>
-      </ol>
-      <p class="note">Merk: Dette er en enkel klient-side generator. Layouten følger grunnoppsettet i PDF-en du delte; om du ønsker nøyaktig layout kan vi iterere videre.</p>
-    </section>
+    <div class="example">
+      <strong>Hvordan det lagres:</strong>
+      <p>Når du klikker Generer .docx vil nettleseren automatisk laste ned en fil (vanligvis til din "Nedlastinger"/Downloads-mappe). Det lagres ikke i repoet eller på en server.</p>
+    </div>
+  </section>
 
-  </main>
-
+  <script src="https://unpkg.com/docx@7.3.0/build/index.umd.js"></script>
   <script src="script.js"></script>
+
+  <footer>
+    <p>Repo: andreasmella/helse-skjema — åpne index.html lokalt i nettleseren.</p>
+  </footer>
 </body>
 </html>

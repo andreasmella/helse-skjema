@@ -1,137 +1,149 @@
-// script.js - klient-side .docx generator
-// Avhengigheter: docx (via CDN) og FileSaver.js
+/* script.js
 
-const jsonFileInput = document.getElementById("jsonFile");
-const logoFileInput = document.getElementById("logoFile");
-const generateBtn = document.getElementById("generateBtn");
-const statusSpan = document.getElementById("status");
-const jsonPreview = document.getElementById("jsonPreview");
+Client-side generator that:
+- leser et JSON-objekt fra bruker
+- valgfritt: leser en logo (PNG/JPG)
+- lager en .docx med header (logo), sidetall i footer, og innhold fra JSON
 
-let loadedJson = null;
-let logoDataUrl = null;
+Design: vi bygger et enkelt, men fleksibelt dokument. Tilpass etter behov.
+*/
 
-jsonFileInput.addEventListener("change", async (e) => {
-  const f = e.target.files[0];
-  if (!f) return;
-  statusSpan.textContent = "Laster JSON...";
-  try {
-    const text = await f.text();
-    loadedJson = JSON.parse(text);
-    jsonPreview.textContent = JSON.stringify(loadedJson, null, 2);
-    statusSpan.textContent = "JSON lastet.";
-  } catch (err) {
-    statusSpan.textContent = "Feil ved lesing/parsing av JSON";
-    console.error(err);
+(async function(){
+  const jsonInput = document.getElementById('jsonFile');
+  const logoInput = document.getElementById('logoFile');
+  const generateBtn = document.getElementById('generateBtn');
+
+  // hent docx API fra global (UMD)
+  const docx = window.docx;
+  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, Footer, Header, ImageRun } = docx;
+
+  function fileToText(file){
+    return new Promise((res, rej)=>{
+      const r = new FileReader();
+      r.onload = ()=>res(r.result);
+      r.onerror = rej;
+      r.readAsText(file, 'utf-8');
+    });
   }
-});
-
-logoFileInput.addEventListener("change", async (e) => {
-  const f = e.target.files[0];
-  if (!f) {
-    logoDataUrl = null; return;
+  function fileToDataUrl(file){
+    return new Promise((res, rej)=>{
+      const r = new FileReader();
+      r.onload = ()=>res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
   }
-  const reader = new FileReader();
-  reader.onload = () => { logoDataUrl = reader.result; statusSpan.textContent = "Logo lastet."; };
-  reader.readAsDataURL(f);
-});
-
-function dataUrlToUint8Array(dataUrl){
-  const base64 = dataUrl.split(',')[1];
-  const binary = atob(base64);
-  const len = binary.length;
-  const u8 = new Uint8Array(len);
-  for (let i=0;i<len;i++) u8[i] = binary.charCodeAt(i);
-  return u8;
-}
-
-// Detect "long text" fields by name or length
-function isLongField(key, value){
-  if (typeof value !== 'string') return false;
-  const keyLower = key.toLowerCase();
-  if (keyLower.includes('fritekst') || keyLower.includes('begrunn') || keyLower.includes('beskrivelse') || keyLower.includes('innhold') || keyLower.includes('begrunnelse')) return true;
-  if (value.length > 300) return true;
-  return false;
-}
-
-async function buildDocument(json){
-  const Docx = window.docx;
-  const { Document, Packer, Paragraph, TextRun, Header, Footer, ImageRun, Table, TableRow, TableCell, WidthType, PageNumber, NumberOfTotalPages } = Docx;
-
-  const doc = new Document({
-    sections: []
-  });
-
-  // header with logo (if provided)
-  let header = null;
-  if (logoDataUrl){
-    const arr = dataUrlToUint8Array(logoDataUrl);
-    // approximate size - we'll set width 120
-    const img = new ImageRun({ data: arr, transformation: { width: 120, height: 40 } });
-    header = new Header({ children: [ new Paragraph({ children: [ img ] }) ] });
-  } else {
-    header = new Header({ children: [ new Paragraph('Helse-skjema') ] });
+  function dataUrlToArrayBuffer(dataUrl){
+    const base64 = dataUrl.split(',')[1];
+    const binary = atob(base64);
+    const len = binary.length;
+    const buffer = new ArrayBuffer(len);
+    const view = new Uint8Array(buffer);
+    for(let i=0;i<len;i++) view[i]=binary.charCodeAt(i);
+    return buffer;
   }
 
-  // footer with page number
-  const footer = new Footer({ children: [ new Paragraph({ children: [ new TextRun('Side '), new PageNumber(), new TextRun(' av '), new NumberOfTotalPages() ], alignment: Docx.AlignmentType.CENTER }) ] });
-
-  // build content paragraphs from JSON
-  const children = [];
-  // top title
-  children.push(new Paragraph({ children: [ new TextRun({ text: json.title || 'Helseopplysninger', bold: true, size: 32 }) ], spacing: { after: 200 } }));
-
-  // If JSON contains structured sections, try to respect that
-  function addKeyValue(key, value){
-    if (isLongField(key, value)){
-      // heading + a large paragraph (preserve newlines)
-      children.push(new Paragraph({ children: [ new TextRun({ text: key+':', bold:true }) ], spacing: { before: 200 } }));
-      const lines = String(value||'').split(/\r?\n/);
-      for (const ln of lines){
-        children.push(new Paragraph(ln));
+  function addParagraphsFromObject(obj){
+    // Forenklet rendering: går gjennom top-level keys og produserer overskrift + verdi
+    const paragraphs = [];
+    for(const key of Object.keys(obj)){
+      const value = obj[key];
+      // Hvis verdi er tekst eller tall
+      if(typeof value === 'string' || typeof value === 'number'){
+        paragraphs.push(new Paragraph({
+          children:[ new TextRun({text: key.toString()+':',bold:true}) ]
+        }));
+        // for lange tekster, behold linjeskift som egne avsnitt
+        const lines = String(value).split(/\r?\n/);
+        for(const ln of lines){
+          paragraphs.push(new Paragraph(ln));
+        }
+      } else if(Array.isArray(value)){
+        paragraphs.push(new Paragraph({children:[ new TextRun({text:key+':',bold:true}) ]}));
+        value.forEach(item=>{
+          paragraphs.push(new Paragraph('- '+String(item)));
+        });
+      } else if(typeof value === 'object' && value !== null){
+        paragraphs.push(new Paragraph({children:[ new TextRun({text:key+':',bold:true}) ]}));
+        // rekursivt inntil ett nivå for lesbarhet
+        for(const subKey of Object.keys(value)){
+          const v = value[subKey];
+          paragraphs.push(new Paragraph({children:[ new TextRun({text: '  '+subKey+': ',bold:true}), new TextRun(String(v))]}));
+        }
       }
-      // add empty line
-      children.push(new Paragraph(''));
+    }
+    return paragraphs;
+  }
+
+  async function buildDocx(jsonObject, logoDataUrl){
+    // header (logo) – hvis ikke logo, header kan være tom
+    let header = undefined;
+    if(logoDataUrl){
+      const imgBuffer = dataUrlToArrayBuffer(logoDataUrl);
+      const image = new ImageRun({data: imgBuffer, transformation:{width:160,height:48}});
+      header = new Header({children:[ new Paragraph({children:[image],alignment:AlignmentType.LEFT}) ]});
+    }
+
+    // footer med sidetall (sentrert)
+    const footer = new Footer({children:[ new Paragraph({children:[ new TextRun({text:'Side '}), new TextRun({children:["{PAGE}"]}), new TextRun({text:' av '}), new TextRun({children:["{NUMPAGES}"]})],alignment:AlignmentType.CENTER}) ]});
+
+    // body: dokumentet kan bestå av flere seksjoner – her en seksjon
+    const content = [];
+
+    // Hvis JSON har 'title' eller 'overskrift', bruk som heading
+    if(jsonObject.title || jsonObject.overskrift){
+      const titleText = jsonObject.title || jsonObject.overskrift || '';
+      content.push(new Paragraph({children:[ new TextRun({text:titleText, bold:true}) ], heading: HeadingLevel.HEADING_1}));
+    }
+
+    // Hvis JSON har en hoved-samling, for eksempel 'fields' eller 'sections'
+    if(jsonObject.sections && Array.isArray(jsonObject.sections)){
+      for(const sec of jsonObject.sections){
+        if(sec.title) content.push(new Paragraph({children:[ new TextRun({text:sec.title, bold:true}) ], heading: HeadingLevel.HEADING_2}));
+        if(sec.body) {
+          const lines = String(sec.body).split(/\r?\n/);
+          lines.forEach(l=>content.push(new Paragraph(l)));
+        }
+        if(sec.fields) content.push(...addParagraphsFromObject(sec.fields));
+      }
     } else {
-      const label = new TextRun({ text: key+': ', bold:true });
-      const content = new TextRun(String(value||''));
-      children.push(new Paragraph({ children: [ label, content ] }));
+      // fallback: skriv ut top-level nøkler
+      content.push(...addParagraphsFromObject(jsonObject));
     }
+
+    const doc = new Document({ sections:[{
+      headers: header ? {default: header} : {},
+      footers: {default: footer},
+      children: content
+    }]});
+
+    return doc;
   }
 
-  // If JSON is array of fields
-  if (Array.isArray(json.fields)){
-    for (const f of json.fields){
-      const k = f.label || f.key || 'felt';
-      const v = f.value || f.default || '';
-      addKeyValue(k, v);
+  generateBtn.addEventListener('click', async ()=>{
+    try{
+      if(!jsonInput.files || !jsonInput.files[0]){ alert('Velg en JSON-fil først'); return; }
+      const txt = await fileToText(jsonInput.files[0]);
+      let data;
+      try{ data = JSON.parse(txt); }catch(e){ alert('Feil ved parsing av JSON: '+e.message); return; }
+      let logoDataUrl = null;
+      if(logoInput.files && logoInput.files[0]){
+        logoDataUrl = await fileToDataUrl(logoInput.files[0]);
+      }
+
+      // bygg dokumentet
+      const doc = await buildDocx(data, logoDataUrl);
+
+      // pakk og last ned
+      const blob = await Packer.toBlob(doc);
+      const fileName = (data.filename && data.filename.endsWith('.docx')) ? data.filename : (data.title ? data.title.replace(/[^a-z0-9_-]/gi,'_')+'.docx' : 'helse-skjema.docx');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = fileName; document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 5000);
+
+    }catch(err){
+      console.error(err); alert('Feil under generering: '+err.message);
     }
-  } else {
-    // iterate keys
-    for (const [k,v] of Object.entries(json)){
-      if (k === 'title' || k === 'fields') continue;
-      addKeyValue(k, v);
-    }
-  }
-
-  doc.addSection({ headers: { default: header }, footers: { default: footer }, children });
-  return { doc, Packer };
-}
-
-generateBtn.addEventListener('click', async () => {
-  if (!loadedJson){ statusSpan.textContent = 'Ingen JSON lastet.'; return; }
-  statusSpan.textContent = 'Genererer...';
-  try{
-    const { doc, Packer } = await buildDocument(loadedJson);
-    const blob = await Packer.toBlob(doc);
-    const filename = (loadedJson.filename || 'helse-skjema') + '.docx';
-    saveAs(blob, filename);
-    statusSpan.textContent = 'Ferdig — fil lastes ned (se nedlastingsmappe).';
-  }catch(err){
-    console.error(err);
-    statusSpan.textContent = 'Feil ved generering: se konsoll.';
-  }
-});
-
-// Quick demo: hvis ingen JSON lastet opp, bruk sample
-// (fjerner denne linjen hvis du ikke ønsker demo-autofill)
-fetch('sample.json').then(r=>r.json()).then(j=>{ if(!loadedJson){ loadedJson = j; jsonPreview.textContent = JSON.stringify(j,null,2);} }).catch(()=>{});
+  });
+})();
