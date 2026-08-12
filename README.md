@@ -1,28 +1,30 @@
-# helse-skjema — klient-side generator
+# helse-skjema
 
-Dette repoet inneholder en enkel klient-side .docx-generator som kjører i nettleseren. Du kan åpne `index.html` lokalt (dobbeltklikk eller åpne i nettleser) og gjøre alt derfra: laste opp JSON og valgfritt logo-bilde, så lastes en .docx-fil ned.
+Dette er en enkel klient-side generator for skjema om helseopplysninger. Målet er at du kan laste ned repoet, åpne `index.html` i nettleseren (lokalt) og laste opp din JSON-fil + logo, og generere en PDF som lastes ned i nettleseren.
 
-Hva jeg har lagt til:
-- index.html — enkel UI for å velge JSON + logo og generere .docx
-- generator.js — logikk som bruker `docx` (dolanmiu/docx) og FileSaver i nettleseren
-- styles.css — litt styling
+Hva jeg la til:
 
-Hvordan bruke:
-1. Åpne `index.html` i nettleseren.
-2. Velg JSON-filen (skjemaet). Hvis du har en stor fil (f.eks. ~700kb) går det fint — alt skjer i nettleseren.
-3. Valgfritt: last opp en PNG/JPG-logo (den settes som header på første side).
-4. Valgfritt: skriv inn navn på felter som skal behandles som lange fritekstfelt (komma-separert). Hvis du lar feltet stå tomt brukes heuristiske regler (sjekker ord som "forespørsel", "merknad", "begrunnelse" osv.).
-5. Klikk "Generer .docx". Filen lastes ned automatisk.
+- index.html: enkel brukerflate for å laste opp JSON og logo, og knapp for å generere PDF.
+- style.css: grunnleggende styling.
+- app.js: funksjonaliteten — leser JSON, bygger forhåndsvisning og genererer PDF (html2pdf/jsPDF). Sidetall legges i bunn.
+- README.md: denne filen.
 
-Design og layout:
-- Jeg følger et enkelt hierarki: tittel (hvis finnes i JSON), så pasientinfo (hvis finnes), så feltene fra JSON.
-- Store fritekstfelt deles i avsnitt ved newline, korte felter settes som én linje.
-- Logo settes i header for første side; sidetall i footer ("Side X av Y").
+Hvordan bruke lokalt:
 
-Hvis du ønsker nøyaktig identisk layout med PDF-en (eksakt skrift, linjehøyder, kolonner, posisjonering osv.) anbefaler jeg å bruke en server-side løsning som genererer PDF direkte (f.eks. Puppeteer/HTML/CSS eller LibreOffice/docx-til-PDF), siden Word/docx har begrensninger i styling og html->docx-konvertering vanligvis kan variere.
+1. Last ned repo (git clone eller last det ned zip).
+2. Åpne `index.html` i en moderne nettleser (Chrome/Edge/Firefox). Ingen server kreves (alt kjører klient-side).
+3. Klikk "Velg JSON" og velg din JSON-fil (den du nevnte på ~725kb). Filen må være gyldig JSON.
+4. (Valgfritt) Last opp logo-bildet.
+5. Klikk "Generer PDF". PDF-en lastes ned til nettleserens nedlastingsmappe.
 
-Neste steg jeg kan gjøre for deg (hvis du ønsker):
-- Finjustere layout for å matche PDFen nøyaktig (må få eksempler og en liste over hvilke JSON-felter som skal være lange).
-- Legge til en server-side generator (Node) som også kan eksportere ferdig PDF.
+Merknader og videre utvikling:
 
+- Løsningen genererer PDF. Hvis du trenger DOCX i tillegg kan vi legge inn en klient-side DOCX-generator (for eksempel ved å pakke inn docx-templater eller bruke server-side generering). DOCX-klientløninger kan kreve tunge bundler eller server-komponent.
+- Designet er ment å være nært original PDF som du la ved — vi kan viderejustere layout (marg, fonter, sidetopp/bunn, farger) når du bekrefter nøyaktig reglene for hvordan felter skal plasseres.
+- Hvis du ønsker at jeg skal legge inn ferdig Helse Sør-Øst-logo i repoet, kan du laste opp logo-filen her eller gi meg beskjed så legger jeg den inn (jeg har brukt en plassholder som kunne lastes opp i nettleseren).
 
+Hvis dette ser greit ut, så kan jeg:
+- legge til flere templates (f.eks. side 2: "Forespørsel om endring i pasientjournal" med stort fritekstfelt formatert som i eksempelfilen), eller
+- implementere DOCX-eksport (tar litt mer arbeid/avklaringer).
+
+Gi beskjed hva du vil at jeg prioriterer videre (DOCX, nøyaktig layout-tilpasning, ferdig logo sjonglering osv.).

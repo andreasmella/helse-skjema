@@ -1,52 +1,56 @@
 <!doctype html>
-<html lang="nb">
+<html lang="no">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Helse-skjema (klient-side generator)</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main>
-    <h1>Helse-skjema — klient-side generator</h1>
-    <p>Last opp JSON (skjema-data) og generer en .docx-fil lokalt. Valgfritt: last opp logo (PNG/JPG). Logo settes i header på første side. Sidetall vises i footer.</p>
+  <div class="container">
+    <header>
+      <div class="header-left">
+        <h1>Skjema om helseopplysninger</h1>
+        <p class="subtitle">(klient-side generator - åpne index.html lokalt)</p>
+      </div>
+      <div class="header-right">
+        <div id="logoPreview">Ingen logo valgt</div>
+      </div>
+    </header>
 
-    <div class="form-row">
-      <label for="jsonFile">1) Last opp JSON-fil med skjemaet</label>
-      <input id="jsonFile" type="file" accept="application/json">
-    </div>
+    <main>
+      <section class="controls">
+        <label>1) Last opp JSON-fil med skjema-data (obligatorisk)</label>
+        <input id="jsonFile" type="file" accept="application/json">
 
-    <div class="form-row">
-      <label for="logoFile">2) Valgfritt: last opp logo (PNG/JPG) — vises i header på første side</label>
-      <input id="logoFile" type="file" accept="image/png,image/jpeg">
-    </div>
+        <label>2) Valgfritt: last opp logo (PNG/JPG). Plasseres i topp-right i dokumentet.</label>
+        <input id="logoFile" type="file" accept="image/*">
 
-    <div class="form-row">
-      <label for="longFields">3) Felt som skal behandles som lange fritekstfelt (komma-separert navn eller tom for heuristisk)</label>
-      <input id="longFields" type="text" placeholder="f.eks. forespørsel,begrunnelse,merknad,opplysninger">
-    </div>
+        <label>3) Generer PDF</label>
+        <button id="generateBtn">Generer PDF</button>
 
-    <div class="form-row">
-      <button id="generateBtn">Generer .docx</button>
-    </div>
+        <p class="note">Filen lastes ned til nettleserens standard nedlastingsmappe.</p>
+      </section>
 
-    <section id="notes">
-      <h2>Hvordan bruke</h2>
-      <ol>
-        <li>Last opp JSON-filen (du kan laste opp store filer direkte i nettleseren).</li>
-        <li>Last opp logo hvis du ønsker (logo vises i topp på første side).</li>
-        <li>Valgfritt: skriv inn felt-navn som skal være lange fritekstfelt (komma-separert). Hvis tomt brukes heuristisk match mot vanlige navn som inneholder "forespørsel", "merknad", etc.</li>
-        <li>Klikk "Generer .docx" — filen lastes ned automatisk.</li>
-      </ol>
-      <p>Merk: dette er en klient-side generator (alt skjer i nettleseren). Hvis du foretrekker å kjøre på server kan vi legge til en node-løsning senere.</p>
-    </section>
+      <section class="preview">
+        <h2>Forhåndsvisning</h2>
+        <div id="printArea" class="print-area hidden">
+          <!-- Innhold bygges dynamisk her -->
+        </div>
+      </section>
 
-    <div id="log" aria-live="polite"></div>
-  </main>
+      <section class="example">
+        <h2>Eksempel JSON (lastes inn hvis du vil se struktur)</h2>
+        <pre id="exampleJson">_</pre>
+      </section>
+    </main>
 
-  <!-- docx (browser build) and FileSaver via CDN -->
-  <script src="https://unpkg.com/docx@7.7.0/build/index.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <script src="generator.js"></script>
+    <footer>
+      <small>Repo: andreasmella/helse-skjema — klient-side generator. Generert av Copilot.</small>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/html2pdf.js@0.9.3/dist/html2pdf.bundle.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
