@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Helse-skjema - Generer DOCX</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:24px;max-width:900px}
+    header{display:flex;align-items:center;gap:16px}
+    header img{height:40px}
+    .card{border:1px solid #ddd;padding:16px;border-radius:8px;margin-top:16px}
+    label{display:block;margin-top:8px}
+    textarea{width:100%;height:180px;font-family:monospace}
+    button{margin-top:12px;padding:10px 16px}
+    footer{margin-top:24px;color:#666;font-size:0.9rem}
+  </style>
+</head>
+<body>
+  <header>
+    <img id="logo-preview" alt="Logo" src="" style="display:none">
+    <h1>Helse-skjema - DOCX-generator (klient-side)</h1>
+  </header>
+
+  <div class="card">
+    <p>Velg JSON-filen med skjema-data. Appen kjører i nettleseren, ingen server kreves.</p>
+
+    <label>JSON-fil (skjema)<br>
+      <input id="json-file" type="file" accept="application/json">
+    </label>
+
+    <label>Logo (valgfritt, PNG/JPEG)<br>
+      <input id="logo-file" type="file" accept="image/*">
+    </label>
+
+    <label>Forhåndsvis JSON (valgfritt):</label>
+    <textarea id="json-preview" placeholder='{

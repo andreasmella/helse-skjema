@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Skjema om helseopplysninger — klient-side DOCX-generator</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; background:#f6f8fa; margin:0; padding:24px; color:#222; }
+    .container { max-width:980px; margin:0 auto; background:#fff; border:1px solid #e1e4e8; padding:18px; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+    header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    h1 { margin:0; font-size:20px; }
+    .subtitle { margin:0; color:#666; font-size:13px; }
+    label { display:block; margin-top:12px; font-weight:600; }
+    input[type="file"], input[type="text"], button { margin-top:6px; }
+    input[type="text"] { width:100%; max-width:560px; padding:6px 8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; }
+    button { background:#0366d6; color:#fff; border:none; padding:8px 14px; border-radius:5px; cursor:pointer; }
+    button:disabled { opacity:0.6; cursor:not-allowed; }
+    .note { color:#666; margin-top:8px; }
+    footer { margin-top:18px; font-size:12px; color:#666; }
+    #logoPreview img { max-height:40px; }
+    #log { margin-top:10px; padding:8px; background:#f3f4f6; border:1px solid #e1e4e8; border-radius:4px; color:#111; white-space:pre-wrap; font-family:monospace; font-size:13px;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Skjema om helseopplysninger</h1>
+        <p class="subtitle">(klient-side DOCX-generator — bruk lokal HTTP-server for best resultat)</p>
+      </div>
+      <div id="logoPreview">Ingen logo valgt</div>
+    </header>
+
+    <main>
+      <label for="jsonFile">1) Last opp JSON-fil med skjema-data (obligatorisk)</label>
+      <input id="jsonFile" type="file" accept="application/json">
+
+      <label for="logoFile">2) Valgfritt: last opp logo (PNG/JPG). Plasseres øverst i dokumentet.</label>
+      <input id="logoFile" type="file" accept="image/*">
+
+      <label for="longFields">Valgfritt: feltnavn som alltid skal behandles som lange fritekstfelt (komma-separert)</label>
+      <input id="longFields" type="text" placeholder="eks: forespørsel, begrunnelse, merknad">
+
+      <label>3) Generer DOCX</label>
+      <button id="generateBtn">Generer DOCX</button>
+
+      <p class="note">Filen lastes ned til nettleserens standard nedlastingsmappe. Åpne utviklerkonsollen (F12) hvis ingenting skjer.</p>
+
+      <div id="log" aria-live="polite">Klar. Velg JSON og trykk "Generer DOCX".</div>
+    </main>
+
+    <footer>
+      <small>Repo: andreasmella/helse-skjema — klient-side generator.</small>
+    </footer>
+  </div>
+
+  <!-- Lokale kopier av bibliotekene i vendor/ -->
+  <script src="vendor/docx.umd.js"></script>
+  <script src="vendor/FileSaver.min.js"></script>
+
+  <!-- Din generatorkode (skal ligge i samme mappe) -->
+  <script src="generator.js"></script>
+
+  <script>
+    // Enkel sjekk og veiledning ved lasting
+    (function(){
+      const logEl = document.getElementById('log');
+      function write(msg){ if(logEl) logEl.textContent = msg; console.log('[helse-skjema] ' + msg); }
+
+      // Vent litt og sjekk at docx og saveAs finnes
+      setTimeout(() => {
+        const hasDocx = !!window.docx;
+        const hasSave = (typeof saveAs === 'function') || !!window.saveAs;
+        if(!hasDocx && !hasSave){
+          write('Feil: lokale biblioteker ikke funnet. Kontroller vendor/docx.umd.js og vendor/FileSaver.min.js. Hvis docx-filens størrelse er veldig liten (<10KB) er den sannsynligvis ikke riktig nedlastet — last ned på nytt.');
+        } else if(!hasDocx){
+          write('Feil: docx ikke funnet (window.docx undefined). Kontroller vendor/docx.umd.js.');
+        } else {
+          write('Biblioteker lastet. Klar til å generere .docx.');
+        }
+      }, 400);
+    })();
+  </script>
+</body>
+</html>

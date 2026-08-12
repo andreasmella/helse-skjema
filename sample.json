@@ -1,0 +1,8 @@
+{
+  "title": "Skjema om helseopplysninger (eksempel)",
+  "navn": "Ola Nordmann",
+  "fodselnummer": "01010112345",
+  "adresse": "Testgata 1, 0123 Oslo",
+  "fritekst_beskrivelse": "Her kan pasienten skrive en lengre forklaring på situasjonen og utdype med fritekst.\nFlere avsnitt støttes.",
+  "samtykke": "Ja"
+}
