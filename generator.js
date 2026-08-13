@@ -59,7 +59,7 @@
 
   async function buildDocxFromJson(jsonObj, logoDataURL, longFieldNames){
     if(!window.docx) throw new Error('docx library (window.docx) ikke funnet. Sjekk at du har lastet scriptet via CDN.');
-    const { Document, Packer, Paragraph, TextRun, HeadingLevel, ImageRun, Footer, AlignmentType } = window.docx;
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel, ImageRun, Footer, Header, AlignmentType } = window.docx;
 
     const doc = new Document({ sections: [] });
 
@@ -77,6 +77,9 @@
         ]
       }));
     }
+
+    // create a Header instance if we have header children
+    const headerObj = headerChildren.length ? new Header({ children: headerChildren }) : undefined;
 
     // Footer - simple text
     const footer = new Footer({
@@ -145,7 +148,7 @@
 
     const section = {
       properties: {},
-      headers: headerChildren.length ? { default: { children: headerChildren } } : {},
+      headers: headerObj ? { default: headerObj } : {},
       footers: { default: footer },
       children
     };
